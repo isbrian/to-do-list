@@ -84,6 +84,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/todolist',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/tab/todolist'),
+        name: 'ToDoList',
+        meta: { title: '管理工作', icon: 'documentation', affix: true }
+      }
+    ]
+  },
+  {
     path: '/documentation',
     component: Layout,
     children: [
