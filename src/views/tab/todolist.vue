@@ -2,6 +2,10 @@
   <div class="tab-container">
     <aside>
       將任務從您的腦海中移到任務清單上來重新找回清晰和寧靜。
+      <br>
+      透過mock模擬API串接，資料再刷新後會恢復預設值。
+      <br>
+      要在準備一個localStorge的版本！
     </aside>
 
     <div class="filter-container sub-navbar draft" style="background: #ffffff;">
@@ -133,10 +137,10 @@ export default {
           this.temp.type = 'DOING'
 
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.importance = 3
-          this.temp.remark = 't1t1t1t1t1t1t1t1'
-          this.temp.timestamp = '2021-08-27T16:32:00.774Z'
-          this.temp.title = 't1'
+          // this.temp.importance = 3
+          // this.temp.remark = 't1t1t1t1t1t1t1t1'
+          this.temp.timestamp = new Date()
+          // this.temp.title = 't1'
           this.temp.status = 'published'
           this.temp.type = 'END'
           this.temp.author = 'vue-element-admin'
