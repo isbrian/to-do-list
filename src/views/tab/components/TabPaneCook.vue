@@ -1,0 +1,160 @@
+<template>
+  <el-table :data="list" border fit highlight-current-row style="width: 100%">
+    <el-table-column
+      v-loading="loading"
+      align="center"
+      label="ID"
+      width="65"
+      element-loading-text="请给我点时间！"
+    >
+      <template slot-scope="scope">
+        <span>{{ scope.row.id }}</span>
+      </template>
+    </el-table-column>
+
+    <el-table-column width="180px" align="center" label="時間">
+      <template slot-scope="scope">
+        <span>{{ Date.parse(scope.row.timestamp) | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+      </template>
+    </el-table-column>
+
+    <el-table-column min-width="300px" label="事項">
+      <template slot-scope="{row}">
+        <span style="margin-right: 10px">{{ row.title }}</span>
+        <el-tag>{{ row.type }}</el-tag>
+      </template>
+    </el-table-column>
+
+    <el-table-column width="120px" label="重要性">
+      <template slot-scope="scope">
+        <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" />
+      </template>
+    </el-table-column>
+
+    <!--    <el-table-column class-name="status-col" label="狀態" width="110">-->
+    <!--      <template slot-scope="{row}">-->
+    <!--        <el-tag :type="row.status | statusFilter">-->
+    <!--          {{ row.status }}-->
+    <!--        </el-tag>-->
+    <!--      </template>-->
+    <!--    </el-table-column>-->
+
+    <el-table-column v-if="type !== 'END'" label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <template slot-scope="{row,$index}">
+        <el-button v-if="row.type !== 'END'" type="primary" size="mini" @click="handleUpdate(row)">
+          編輯
+        </el-button>
+        <el-button v-if="row.type !== 'END'" type="primary" size="mini" @click="handleEnd(row)">
+          完成
+        </el-button>
+        <el-button v-if="row.type !== 'END'" size="mini" type="danger" @click="handleDelete(row,$index)">
+          刪除
+        </el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+</template>
+
+<script>
+// import { fetchList } from '@/api/todolist'
+
+export default {
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
+    }
+  },
+  props: {
+    type: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
+    return {
+      list: null,
+      listQuery: {
+        page: 1,
+        limit: 5000,
+        type: this.type,
+        sort: '-id'
+      },
+      loading: false
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    handleDelete(row, index) {
+      this.$emit('del', row, index) // for test
+
+      // this.$notify({
+      //   title: 'Success',
+      //   message: 'Delete Successfully',
+      //   type: 'success',
+      //   duration: 2000
+      // })
+      // this.list.splice(index, 1)
+    },
+    handleUpdate(row) {
+      this.$emit('update', row) // for test
+
+      // this.temp = Object.assign({}, row) // copy obj
+      // this.temp.timestamp = new Date(this.temp.timestamp)
+      // this.dialogStatus = 'update'
+      // this.dialogFormVisible = true
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
+    },
+    handleEnd(row) {
+      this.$emit('end', row) // for test
+
+      // this.temp = Object.assign({}, row) // copy obj
+      // this.temp.timestamp = new Date(this.temp.timestamp)
+      // this.dialogStatus = 'update'
+      // this.dialogFormVisible = true
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
+    },
+    getList() {
+      this.loading = true
+      this.$emit('create') // for test
+
+      // console.log('eee:' + JSON.stringify(this.listQuery))
+
+      // this.listQuery.type = (this.listQuery.type === 'ALL') ? '' : this.listQuery.type
+      //
+      // fetchList(this.listQuery).then(response => {
+      //   this.list = response.data.items
+      //   this.loading = false
+      //
+      //   this.$emit('list', response.data.items) // for test
+      // })
+
+      if (window.localStorage.getItem('todo') !== null) {
+        this.list = JSON.parse(window.localStorage.getItem('todo'))
+      } else {
+        this.list = []
+      }
+
+      // console.log('eee:' + JSON.stringify(this.list))
+
+      // 排序列表
+      this.$emit('list', this.list.sort(function(a, b) {
+        return b.id - a.id // b - a > 0
+      }))
+
+      this.loading = false
+    }
+  }
+}
+</script>
+

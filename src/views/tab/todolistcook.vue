@@ -3,9 +3,7 @@
     <aside>
       將任務從您的腦海中移到任務清單上來重新找回清晰和寧靜。
       <br>
-      透過mock模擬API串接，資料再刷新後會恢復預設值。
-      <br>
-      要在準備一個localStorge的版本！
+      採用localStorage進行本地端紀錄
     </aside>
 
     <div class="filter-container sub-navbar draft" style="background: #ffffff;">
@@ -20,7 +18,7 @@
     <el-tabs v-model="activeName" style="margin-top:15px;" type="border-card">
       <el-tab-pane v-for="item in tabMapOptions" :key="item.key" :label="item.label" :name="item.key">
         <keep-alive>
-          <tab-pane v-if="activeName==item.key" :type="item.key" @update="handleUpdate" @list="handleList" @del="handleDelete" />
+          <tab-pane v-if="activeName==item.key" :type="item.key" @update="handleUpdate" @end="endData" @list="handleList" @del="handleDelete" />
         </keep-alive>
       </el-tab-pane>
     </el-tabs>
@@ -59,8 +57,8 @@
 
 <script>
 import waves from '@/directive/waves' // waves directive
-import TabPane from './components/TabPane'
-import { createArticle, updateArticle } from '@/api/todolist'
+import TabPane from './components/TabPaneCook'
+// import { createArticle, updateArticle } from '@/api/todolist'
 
 export default {
   name: 'ToDoList',
@@ -113,31 +111,69 @@ export default {
     }
   },
   created() {
+    this.init()
+
     const tab = this.$route.query.tab
     if (tab) {
       this.activeName = tab
     }
   },
   methods: {
+    init() {
+      // 表格欄位寬度
+      // if (window.localStorage.getItem('queryTeamBalanceWidth') !== null) {
+      //   this.clumWidth = JSON.parse(window.localStorage.getItem('queryTeamBalanceWidth'))
+      // } else {
+      //   this.clumWidth = []
+      // }
+    },
     createData() {
+      // if (isHave) {
+      //   /** 存在就替換 */
+      //   this.clumWidth.splice(idx, 1, { 'property': column.property, 'width': column.width })
+      // } else {
+      //   /** 不存在就新增 */
+      //   this.clumWidth.push({ 'property': column.property, 'width': column.width })
+      // }
+
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          this.temp.type = 'DOING'
-          this.temp.remark = ''
-          this.temp.timestamp = new Date()
-          this.temp.status = 'published'
+          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          // this.temp.author = 'vue-element-admin'
+          // this.temp.type = 'DOING'
+          // this.temp.remark = ''
+          // this.temp.timestamp = new Date()
+          // this.temp.status = 'published'
 
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: '新增完成',
-              type: 'success',
-              duration: 2000
-            })
+          // console.log('list:' + JSON.stringify(this.list))
+          console.log('list:' + this.list[0])
+
+          const id = (this.list[0] !== undefined) ? this.list[0].id + 1 : parseInt(Math.random() * 100) + 1024
+
+          console.log('list:' + id)
+
+          // const todo = []
+          this.list.push({
+            'id': id,
+            'title': this.temp.title,
+            'importance': this.temp.importance,
+            'author': 'vue-element-admin',
+            'type': 'DOING',
+            'remark': '',
+            'timestamp': new Date(),
+            'status': 'published'
+          })
+          window.localStorage.setItem('todo', JSON.stringify(this.list))
+
+          // 排序列表
+          this.list.sort(function(a, b) { return b.id - a.id }) // b - a > 0
+
+          this.dialogFormVisible = false
+          this.$notify({
+            title: 'Success',
+            message: '新增完成',
+            type: 'success',
+            duration: 2000
           })
         }
       })
@@ -148,9 +184,41 @@ export default {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
 
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex(v => v.id === this.temp.id)
-            this.list.splice(index, 1, this.temp)
+          // updateArticle(tempData).then(() => {
+          //   const index = this.list.findIndex(v => v.id === this.temp.id)
+          //   this.list.splice(index, 1, this.temp)
+          //   this.dialogFormVisible = false
+          //   this.$notify({
+          //     title: 'Success',
+          //     message: '更新完成',
+          //     type: 'success',
+          //     duration: 2000
+          //   })
+          // })
+
+          console.log('idx:' + this.temp.id)
+
+          const idx = this.list.findIndex(v => v.id === this.temp.id)
+          const isHave = (idx >= 0)
+
+          // const isHave = this.list.find(function(item, index, array) {
+          //   idx = index
+          //   return item.id === idx
+          // })
+          console.log('isHave:' + isHave)
+
+          if (isHave) {
+            /** 存在就替換 */
+            this.list.splice(idx, 1, {
+              'id': this.temp.id,
+              'title': this.temp.title,
+              'importance': this.temp.importance,
+              'author': 'vue-element-admin',
+              'type': 'DOING',
+              'remark': '',
+              'timestamp': new Date(),
+              'status': 'published'
+            })
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -158,7 +226,15 @@ export default {
               type: 'success',
               duration: 2000
             })
-          })
+          } else {
+            this.$notify({
+              title: 'Success',
+              message: '更新失敗',
+              type: 'success',
+              duration: 2000
+            })
+          }
+          window.localStorage.setItem('todo', JSON.stringify(this.list))
         }
       })
     },
@@ -176,6 +252,52 @@ export default {
     handleList(list) {
       this.list = list
     },
+    endData(row) {
+      console.log('end')
+
+      // this.temp = Object.assign({}, row) // copy obj
+      // this.temp.timestamp = new Date(this.temp.timestamp)
+      // this.dialogStatus = 'end'
+      // this.dialogFormVisible = true
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      // })
+
+      const idx = this.list.findIndex(v => v.id === row.id)
+      const isHave = (idx >= 0)
+
+      console.log('end:' + row.id)
+      console.log('end:' + idx)
+
+      if (isHave) {
+        /** 存在就替換 */
+        this.list.splice(idx, 1, {
+          'id': row.id,
+          'title': row.title,
+          'importance': row.importance,
+          'author': 'vue-element-admin',
+          'type': 'END',
+          'remark': '',
+          'timestamp': new Date(),
+          'status': 'published'
+        })
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'Success',
+          message: '更新完成',
+          type: 'success',
+          duration: 2000
+        })
+      } else {
+        this.$notify({
+          title: 'Success',
+          message: '更新失敗',
+          type: 'success',
+          duration: 2000
+        })
+      }
+      window.localStorage.setItem('todo', JSON.stringify(this.list))
+    },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
@@ -186,6 +308,8 @@ export default {
       })
     },
     handleDelete(row, index) {
+      console.log('del:' + index)
+
       this.$notify({
         title: 'Success',
         message: '刪除完畢',
@@ -193,6 +317,8 @@ export default {
         duration: 2000
       })
       this.list.splice(index, 1)
+
+      window.localStorage.setItem('todo', JSON.stringify(this.list))
     },
     handleCreate() {
       this.resetTemp()
