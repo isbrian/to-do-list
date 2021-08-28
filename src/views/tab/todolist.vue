@@ -12,45 +12,45 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        輸出
-      </el-button>
+      <!--      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">-->
+      <!--        輸出-->
+      <!--      </el-button>-->
     </div>
 
     <el-tabs v-model="activeName" style="margin-top:15px;" type="border-card">
       <el-tab-pane v-for="item in tabMapOptions" :key="item.key" :label="item.label" :name="item.key">
         <keep-alive>
-          <tab-pane v-if="activeName==item.key" :type="item.key" @create="showCreatedTimes" @update="handleUpdate" @list="handleList" />
+          <tab-pane v-if="activeName==item.key" :type="item.key" @update="handleUpdate" @list="handleList" @del="handleDelete" />
         </keep-alive>
       </el-tab-pane>
     </el-tabs>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 90%; margin-left:50px;">
+        <!--        <el-form-item label="Date" prop="timestamp">-->
+        <!--          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />-->
+        <!--        </el-form-item>-->
+        <el-form-item label="事項" prop="title">
+          <el-input v-model="temp.title" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" />
         </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
+        <!--        <el-form-item label="Status">-->
+        <!--          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">-->
+        <!--            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />-->
+        <!--          </el-select>-->
+        <!--        </el-form-item>-->
+        <el-form-item label="重要性">
           <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
         </el-form-item>
-        <el-form-item label="Remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-        </el-form-item>
+        <!--        <el-form-item label="Remark">-->
+        <!--          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />-->
+        <!--        </el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          確定
         </el-button>
       </div>
     </el-dialog>
@@ -62,13 +62,6 @@ import waves from '@/directive/waves' // waves directive
 import TabPane from './components/TabPane'
 import { createArticle, updateArticle } from '@/api/todolist'
 
-// const calendarTypeOptions = [
-//   { key: 'CN', display_name: 'China' },
-//   { key: 'US', display_name: 'USA' },
-//   { key: 'JP', display_name: 'Japan' },
-//   { key: 'EU', display_name: 'Eurozone' }
-// ]
-
 export default {
   name: 'ToDoList',
   components: { TabPane },
@@ -76,14 +69,12 @@ export default {
   data() {
     return {
       list: null,
-      // calendarTypeOptions,
       tabMapOptions: [
         { label: '全部', key: 'ALL' },
         { label: '進行中', key: 'DOING' },
         { label: '已完成', key: 'END' }
       ],
       activeName: 'ALL',
-      // createdTimes: 0,
       listQuery: {
         page: 1,
         limit: 20,
@@ -95,8 +86,8 @@ export default {
       dialogStatus: '',
       dialogFormVisible: false,
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '編輯代辦項目',
+        create: '新增代辦項目'
       },
       temp: {
         id: undefined,
@@ -122,7 +113,6 @@ export default {
     }
   },
   created() {
-    // init the default selected tab
     const tab = this.$route.query.tab
     if (tab) {
       this.activeName = tab
@@ -135,22 +125,16 @@ export default {
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
           this.temp.author = 'vue-element-admin'
           this.temp.type = 'DOING'
-
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          // this.temp.importance = 3
-          // this.temp.remark = 't1t1t1t1t1t1t1t1'
+          this.temp.remark = ''
           this.temp.timestamp = new Date()
-          // this.temp.title = 't1'
           this.temp.status = 'published'
-          this.temp.type = 'END'
-          this.temp.author = 'vue-element-admin'
 
           createArticle(this.temp).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
-              message: 'Created Successfully',
+              message: '新增完成',
               type: 'success',
               duration: 2000
             })
@@ -158,19 +142,11 @@ export default {
         }
       })
     },
-    handleList(list) {
-      // console.log('list:' + JSON.stringify(list))
-
-      this.list = list
-    },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-
-          // console.log('eee:' + JSON.stringify(tempData))
-          // console.log('www:' + JSON.stringify(this.list))
 
           updateArticle(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
@@ -178,7 +154,7 @@ export default {
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
-              message: 'Update Successfully',
+              message: '更新完成',
               type: 'success',
               duration: 2000
             })
@@ -197,9 +173,10 @@ export default {
         type: ''
       }
     },
+    handleList(list) {
+      this.list = list
+    },
     handleUpdate(row) {
-      console.log('xxx:' + JSON.stringify(row))
-
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
@@ -208,6 +185,15 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    handleDelete(row, index) {
+      this.$notify({
+        title: 'Success',
+        message: '刪除完畢',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
+    },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -215,29 +201,21 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
-      })
-    },
-    showCreatedTimes() {
-      console.log('www')
-
-      // console.log('xxx' + this.createdTimes)
-      // this.createdTimes = this.createdTimes + 1
-
-      // console.log('www' + this.createdTimes)
     }
+    // handleDownload() {
+    //   this.downloadLoading = true
+    //   import('@/vendor/Export2Excel').then(excel => {
+    //     const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
+    //     const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
+    //     const data = this.formatJson(filterVal)
+    //     excel.export_json_to_excel({
+    //       header: tHeader,
+    //       data,
+    //       filename: 'table-list'
+    //     })
+    //     this.downloadLoading = false
+    //   })
+    // }
   }
 }
 </script>

@@ -20,16 +20,10 @@
 
     <el-table-column min-width="300px" label="事項">
       <template slot-scope="{row}">
-        <span>{{ row.title }}</span>
+        <span style="margin-right: 10px">{{ row.title }}</span>
         <el-tag>{{ row.type }}</el-tag>
       </template>
     </el-table-column>
-
-    <!--    <el-table-column width="110px" align="center" label="Author">-->
-    <!--      <template slot-scope="scope">-->
-    <!--        <span>{{ scope.row.author }}</span>-->
-    <!--      </template>-->
-    <!--    </el-table-column>-->
 
     <el-table-column width="120px" label="重要性">
       <template slot-scope="scope">
@@ -37,32 +31,22 @@
       </template>
     </el-table-column>
 
-    <!--    <el-table-column align="center" label="Readings" width="95">-->
-    <!--      <template slot-scope="scope">-->
-    <!--        <span>{{ scope.row.pageviews }}</span>-->
+    <!--    <el-table-column class-name="status-col" label="狀態" width="110">-->
+    <!--      <template slot-scope="{row}">-->
+    <!--        <el-tag :type="row.status | statusFilter">-->
+    <!--          {{ row.status }}-->
+    <!--        </el-tag>-->
     <!--      </template>-->
     <!--    </el-table-column>-->
 
-    <el-table-column class-name="status-col" label="狀態" width="110">
-      <template slot-scope="{row}">
-        <el-tag :type="row.status | statusFilter">
-          {{ row.status }}
-        </el-tag>
-      </template>
-    </el-table-column>
     <el-table-column v-if="type !== 'END'" label="操作" align="center" width="230" class-name="small-padding fixed-width">
       <template slot-scope="{row,$index}">
-        <el-button type="primary" size="mini" @click="handleUpdate(row)">
-          Edit
+        <el-button v-if="row.type !== 'END'" type="primary" size="mini" @click="handleUpdate(row)">
+          編輯
         </el-button>
-        <!--        <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">-->
-        <!--          Publish-->
-        <!--        </el-button>-->
-        <!--        <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">-->
-        <!--          Draft-->
-        <!--        </el-button>-->
-        <el-button v-if="row.status!='published'" size="mini" type="danger" @click="handleDelete(row,$index)">
-          Delete
+
+        <el-button v-if="row.type !== 'END'" size="mini" type="danger" @click="handleDelete(row,$index)">
+          刪除
         </el-button>
       </template>
     </el-table-column>
@@ -105,6 +89,17 @@ export default {
     this.getList()
   },
   methods: {
+    handleDelete(row, index) {
+      this.$emit('del', row, index) // for test
+
+      // this.$notify({
+      //   title: 'Success',
+      //   message: 'Delete Successfully',
+      //   type: 'success',
+      //   duration: 2000
+      // })
+      // this.list.splice(index, 1)
+    },
     handleUpdate(row) {
       this.$emit('update', row) // for test
 
