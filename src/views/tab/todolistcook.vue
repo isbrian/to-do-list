@@ -1,9 +1,11 @@
 <template>
   <div class="tab-container">
     <aside>
-      透過mock模擬API串接。
+      將任務從您的腦海中移到任務清單上來重新找回清晰和寧靜。
       <br>
-      當頁面刷新後，資料會恢復預設值。
+      透過mock模擬API串接，資料再刷新後會恢復預設值。
+      <br>
+      要在準備一個localStorge的版本！
     </aside>
 
     <div class="filter-container sub-navbar draft" style="background: #ffffff;">
