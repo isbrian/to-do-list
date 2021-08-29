@@ -3,7 +3,7 @@
     <aside>
       透過mock模擬API串接。
       <br>
-      當頁面刷新後，資料會恢復預設值。
+      僅模擬資料串接，各tab數據無法正常同步，當頁面刷新後，資料會恢復預設值。
     </aside>
 
     <div class="filter-container sub-navbar draft" style="background: #ffffff;">
@@ -73,14 +73,6 @@ export default {
         { label: '已完成', key: 'END' }
       ],
       activeName: 'ALL',
-      // listQuery: {
-      //   page: 1,
-      //   limit: 20,
-      //   importance: undefined,
-      //   title: undefined,
-      //   type: undefined,
-      //   sort: '+id'
-      // },
       dialogStatus: '',
       dialogFormVisible: false,
       textMap: {
@@ -101,8 +93,6 @@ export default {
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       }
-      // downloadLoading: false,
-      // statusOptions: ['published', 'draft', 'deleted']
     }
   },
   watch: {

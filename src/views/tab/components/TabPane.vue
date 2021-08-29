@@ -78,7 +78,7 @@ export default {
       list: null,
       listQuery: {
         page: 1,
-        limit: 5000,
+        limit: 500,
         type: this.type,
         sort: '-id'
       },
@@ -90,42 +90,21 @@ export default {
   },
   methods: {
     handleDelete(row, index) {
-      this.$emit('del', row, index) // for test
-
-      // this.$notify({
-      //   title: 'Success',
-      //   message: 'Delete Successfully',
-      //   type: 'success',
-      //   duration: 2000
-      // })
-      // this.list.splice(index, 1)
+      this.$emit('del', row, index)
     },
     handleUpdate(row) {
-      this.$emit('update', row) // for test
-
-      // this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      // this.dialogStatus = 'update'
-      // this.dialogFormVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
+      this.$emit('update', row)
     },
     getList() {
-      console.log('type:' + this.listQuery.type)
-
       this.loading = true
-      this.$emit('create') // for test
-
-      // console.log('eee:' + JSON.stringify(this.listQuery))
-
+      this.$emit('create')
       this.listQuery.type = (this.listQuery.type === 'ALL') ? '' : this.listQuery.type
 
       fetchList(this.listQuery).then(response => {
         this.list = response.data.items
         this.loading = false
 
-        this.$emit('list', response.data.items) // for test
+        this.$emit('list', response.data.items)
       })
     }
   }
