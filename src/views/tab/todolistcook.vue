@@ -67,6 +67,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      listALL: null,
       list: null,
       tabMapOptions: [
         { label: '全部', key: 'ALL' },
@@ -149,12 +150,15 @@ export default {
           // console.log('list:' + JSON.stringify(this.list))
           console.log('list:' + this.list[0])
 
-          const id = (this.list[0] !== undefined) ? this.list[0].id + 1 : parseInt(Math.random() * 100) + 1024
+          this.listAll = JSON.parse(window.localStorage.getItem('todo')).sort(function(a, b) { return b.id - a.id })
+          const id = (this.listAll[0] !== undefined)
+            ? this.listAll[0].id + 1
+            : parseInt(Math.random() * 100) + 1024
 
           console.log('list:' + id)
 
           // const todo = []
-          this.list.push({
+          this.listAll.push({
             'id': id,
             'title': this.temp.title,
             'importance': this.temp.importance,
@@ -164,10 +168,10 @@ export default {
             'timestamp': new Date(),
             'status': 'published'
           })
-          window.localStorage.setItem('todo', JSON.stringify(this.list))
+          window.localStorage.setItem('todo', JSON.stringify(this.listAll))
 
           // 排序列表
-          this.list.sort(function(a, b) { return b.id - a.id }) // b - a > 0
+          this.listAll.sort(function(a, b) { return b.id - a.id }) // b - a > 0
 
           this.dialogFormVisible = false
           this.$notify({
@@ -185,22 +189,12 @@ export default {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
 
-          // updateArticle(tempData).then(() => {
-          //   const index = this.list.findIndex(v => v.id === this.temp.id)
-          //   this.list.splice(index, 1, this.temp)
-          //   this.dialogFormVisible = false
-          //   this.$notify({
-          //     title: 'Success',
-          //     message: '更新完成',
-          //     type: 'success',
-          //     duration: 2000
-          //   })
-          // })
-
           console.log('idx:' + this.temp.id)
-
-          const idx = this.list.findIndex(v => v.id === this.temp.id)
+          this.listAll = JSON.parse(window.localStorage.getItem('todo'))
+          const idx = this.listAll.findIndex(v => v.id === this.temp.id)
           const isHave = (idx >= 0)
+
+          console.log('idx:' + JSON.stringify(idx))
 
           // const isHave = this.list.find(function(item, index, array) {
           //   idx = index
@@ -210,7 +204,7 @@ export default {
 
           if (isHave) {
             /** 存在就替換 */
-            this.list.splice(idx, 1, {
+            this.listAll.splice(idx, 1, {
               'id': this.temp.id,
               'title': this.temp.title,
               'importance': this.temp.importance,
@@ -235,7 +229,10 @@ export default {
               duration: 2000
             })
           }
-          window.localStorage.setItem('todo', JSON.stringify(this.list))
+
+          // console.log('uuu:' + JSON.stringify(this.list))
+
+          window.localStorage.setItem('todo', JSON.stringify(this.listAll))
         }
       })
     },
@@ -264,7 +261,8 @@ export default {
       //   this.$refs['dataForm'].clearValidate()
       // })
 
-      const idx = this.list.findIndex(v => v.id === row.id)
+      this.listAll = JSON.parse(window.localStorage.getItem('todo'))
+      const idx = this.listAll.findIndex(v => v.id === row.id)
       const isHave = (idx >= 0)
 
       console.log('end:' + row.id)
@@ -272,7 +270,7 @@ export default {
 
       if (isHave) {
         /** 存在就替換 */
-        this.list.splice(idx, 1, {
+        this.listAll.splice(idx, 1, {
           'id': row.id,
           'title': row.title,
           'importance': row.importance,
@@ -297,7 +295,7 @@ export default {
           duration: 2000
         })
       }
-      window.localStorage.setItem('todo', JSON.stringify(this.list))
+      window.localStorage.setItem('todo', JSON.stringify(this.listAll))
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -308,8 +306,13 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    handleDelete(row, index) {
-      console.log('del:' + index)
+    handleDelete(row, index, id) {
+      console.log('del:' + id)
+
+      this.listAll = JSON.parse(window.localStorage.getItem('todo'))
+      const idx = this.listAll.findIndex(v => v.id === id)
+
+      console.log('idx:' + idx)
 
       this.$notify({
         title: 'Success',
@@ -317,9 +320,9 @@ export default {
         type: 'success',
         duration: 2000
       })
-      this.list.splice(index, 1)
+      this.listAll.splice(idx, 1)
 
-      window.localStorage.setItem('todo', JSON.stringify(this.list))
+      window.localStorage.setItem('todo', JSON.stringify(this.listAll))
     },
     handleCreate() {
       this.resetTemp()

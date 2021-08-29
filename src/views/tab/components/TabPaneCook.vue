@@ -47,7 +47,7 @@
         <el-button v-if="row.type !== 'END'" type="primary" size="mini" @click="handleEnd(row)">
           完成
         </el-button>
-        <el-button v-if="row.type !== 'END'" size="mini" type="danger" @click="handleDelete(row,$index)">
+        <el-button v-if="row.type !== 'END'" size="mini" type="danger" @click="handleDelete(row,$index,row.id)">
           刪除
         </el-button>
       </template>
@@ -91,8 +91,8 @@ export default {
     this.getList()
   },
   methods: {
-    handleDelete(row, index) {
-      this.$emit('del', row, index)
+    handleDelete(row, index, id) {
+      this.$emit('del', row, index, id)
     },
     handleUpdate(row) {
       this.$emit('update', row)
