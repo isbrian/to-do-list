@@ -92,67 +92,66 @@ export default {
   },
   methods: {
     handleDelete(row, index) {
-      this.$emit('del', row, index) // for test
-
-      // this.$notify({
-      //   title: 'Success',
-      //   message: 'Delete Successfully',
-      //   type: 'success',
-      //   duration: 2000
-      // })
-      // this.list.splice(index, 1)
+      this.$emit('del', row, index)
     },
     handleUpdate(row) {
-      this.$emit('update', row) // for test
-
-      // this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      // this.dialogStatus = 'update'
-      // this.dialogFormVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
+      this.$emit('update', row)
     },
     handleEnd(row) {
-      this.$emit('end', row) // for test
-
-      // this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      // this.dialogStatus = 'update'
-      // this.dialogFormVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
+      this.$emit('end', row)
     },
     getList() {
       this.loading = true
-      this.$emit('create') // for test
-
-      // console.log('eee:' + JSON.stringify(this.listQuery))
-
-      // this.listQuery.type = (this.listQuery.type === 'ALL') ? '' : this.listQuery.type
-      //
-      // fetchList(this.listQuery).then(response => {
-      //   this.list = response.data.items
-      //   this.loading = false
-      //
-      //   this.$emit('list', response.data.items) // for test
-      // })
+      this.$emit('create')
 
       if (window.localStorage.getItem('todo') !== null) {
-        this.list = JSON.parse(window.localStorage.getItem('todo'))
+        const objList = []
+        if (this.listQuery.type === 'END') {
+          JSON.parse(window.localStorage.getItem('todo')).find(function(item, index, array) {
+            if (item.type === 'END') {
+              objList.push(item)
+              // ss.push({
+              //   'id': item.id,
+              //   'title': item.title,
+              //   'importance': item.importance,
+              //   'author': 'vue-element-admin',
+              //   'type': item.type,
+              //   'remark': '',
+              //   'timestamp': new Date(),
+              //   'status': item.status
+              // })
+            }
+          })
+          this.list = objList
+        } else if (this.listQuery.type === 'DOING') {
+          JSON.parse(window.localStorage.getItem('todo')).find(function(item, index, array) {
+            if (item.type === 'DOING') {
+              objList.push(item)
+              // ss.push({
+              //   'id': item.id,
+              //   'title': item.title,
+              //   'importance': item.importance,
+              //   'author': 'vue-element-admin',
+              //   'type': item.type,
+              //   'remark': '',
+              //   'timestamp': new Date(),
+              //   'status': item.status
+              // })
+            }
+          })
+          this.list = objList
+        } else {
+          this.list = JSON.parse(window.localStorage.getItem('todo'))
+        }
       } else {
         this.list = []
       }
-
-      // console.log('eee:' + JSON.stringify(this.list))
+      this.loading = false
 
       // 排序列表
       this.$emit('list', this.list.sort(function(a, b) {
         return b.id - a.id // b - a > 0
       }))
-
-      this.loading = false
     }
   }
 }

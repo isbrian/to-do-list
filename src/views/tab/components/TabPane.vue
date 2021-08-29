@@ -112,6 +112,8 @@ export default {
       // })
     },
     getList() {
+      console.log('type:' + this.listQuery.type)
+
       this.loading = true
       this.$emit('create') // for test
 

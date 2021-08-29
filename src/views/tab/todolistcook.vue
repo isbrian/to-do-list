@@ -17,9 +17,10 @@
 
     <el-tabs v-model="activeName" style="margin-top:15px;" type="border-card">
       <el-tab-pane v-for="item in tabMapOptions" :key="item.key" :label="item.label" :name="item.key">
-        <keep-alive>
-          <tab-pane v-if="activeName==item.key" :type="item.key" @update="handleUpdate" @end="endData" @list="handleList" @del="handleDelete" />
-        </keep-alive>
+        <tab-pane v-if="activeName==item.key" :type="item.key" @update="handleUpdate" @end="endData" @list="handleList" @del="handleDelete" />
+        <!--        <keep-alive>-->
+        <!--          <tab-pane v-if="activeName==item.key" :type="item.key" @update="handleUpdate" @end="endData" @list="handleList" @del="handleDelete" />-->
+        <!--        </keep-alive>-->
       </el-tab-pane>
     </el-tabs>
 
