@@ -73,14 +73,14 @@ export default {
         { label: '已完成', key: 'END' }
       ],
       activeName: 'ALL',
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
-      },
+      // listQuery: {
+      //   page: 1,
+      //   limit: 20,
+      //   importance: undefined,
+      //   title: undefined,
+      //   type: undefined,
+      //   sort: '+id'
+      // },
       dialogStatus: '',
       dialogFormVisible: false,
       textMap: {
@@ -100,9 +100,9 @@ export default {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false,
-      statusOptions: ['published', 'draft', 'deleted']
+      }
+      // downloadLoading: false,
+      // statusOptions: ['published', 'draft', 'deleted']
     }
   },
   watch: {

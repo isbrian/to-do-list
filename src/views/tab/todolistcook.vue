@@ -59,10 +59,10 @@
 <script>
 import waves from '@/directive/waves' // waves directive
 import TabPane from './components/TabPaneCook'
-// import { createArticle, updateArticle } from '@/api/todolist'
 
 export default {
   name: 'ToDoList',
+  inject: ['reload'],
   components: { TabPane },
   directives: { waves },
   data() {
@@ -75,14 +75,6 @@ export default {
         { label: '已完成', key: 'END' }
       ],
       activeName: 'ALL',
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
-      },
       dialogStatus: '',
       dialogFormVisible: false,
       textMap: {
@@ -102,9 +94,7 @@ export default {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false,
-      statusOptions: ['published', 'draft', 'deleted']
+      }
     }
   },
   watch: {
@@ -113,51 +103,25 @@ export default {
     }
   },
   created() {
-    this.init()
-
     const tab = this.$route.query.tab
     if (tab) {
       this.activeName = tab
     }
   },
   methods: {
-    init() {
-      // 表格欄位寬度
-      // if (window.localStorage.getItem('queryTeamBalanceWidth') !== null) {
-      //   this.clumWidth = JSON.parse(window.localStorage.getItem('queryTeamBalanceWidth'))
-      // } else {
-      //   this.clumWidth = []
-      // }
-    },
     createData() {
-      // if (isHave) {
-      //   /** 存在就替換 */
-      //   this.clumWidth.splice(idx, 1, { 'property': column.property, 'width': column.width })
-      // } else {
-      //   /** 不存在就新增 */
-      //   this.clumWidth.push({ 'property': column.property, 'width': column.width })
-      // }
-
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          // this.temp.author = 'vue-element-admin'
-          // this.temp.type = 'DOING'
-          // this.temp.remark = ''
-          // this.temp.timestamp = new Date()
-          // this.temp.status = 'published'
+          if (window.localStorage.getItem('todo') !== null) {
+            this.listAll = JSON.parse(window.localStorage.getItem('todo')).sort(function(a, b) { return b.id - a.id })
+          } else {
+            this.listAll = []
+          }
 
-          // console.log('list:' + JSON.stringify(this.list))
-          console.log('list:' + this.list[0])
-
-          this.listAll = JSON.parse(window.localStorage.getItem('todo')).sort(function(a, b) { return b.id - a.id })
-          const id = (this.listAll[0] !== undefined)
+          const id = (window.localStorage.getItem('todo') !== null)
             ? this.listAll[0].id + 1
             : parseInt(Math.random() * 100) + 1024
 
-          console.log('list:' + id)
-
-          // const todo = []
           this.listAll.push({
             'id': id,
             'title': this.temp.title,
@@ -171,7 +135,9 @@ export default {
           window.localStorage.setItem('todo', JSON.stringify(this.listAll))
 
           // 排序列表
-          this.listAll.sort(function(a, b) { return b.id - a.id }) // b - a > 0
+          if (window.localStorage.getItem('todo') !== null) {
+            this.listAll.sort(function(a, b) { return b.id - a.id }) // b - a > 0
+          }
 
           this.dialogFormVisible = false
           this.$notify({
@@ -180,6 +146,8 @@ export default {
             type: 'success',
             duration: 2000
           })
+
+          this.reload()
         }
       })
     },
@@ -189,18 +157,9 @@ export default {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
 
-          console.log('idx:' + this.temp.id)
           this.listAll = JSON.parse(window.localStorage.getItem('todo'))
           const idx = this.listAll.findIndex(v => v.id === this.temp.id)
           const isHave = (idx >= 0)
-
-          console.log('idx:' + JSON.stringify(idx))
-
-          // const isHave = this.list.find(function(item, index, array) {
-          //   idx = index
-          //   return item.id === idx
-          // })
-          console.log('isHave:' + isHave)
 
           if (isHave) {
             /** 存在就替換 */
@@ -230,9 +189,9 @@ export default {
             })
           }
 
-          // console.log('uuu:' + JSON.stringify(this.list))
-
           window.localStorage.setItem('todo', JSON.stringify(this.listAll))
+
+          this.reload()
         }
       })
     },
@@ -251,22 +210,9 @@ export default {
       this.list = list
     },
     endData(row) {
-      console.log('end')
-
-      // this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      // this.dialogStatus = 'end'
-      // this.dialogFormVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
-
       this.listAll = JSON.parse(window.localStorage.getItem('todo'))
       const idx = this.listAll.findIndex(v => v.id === row.id)
       const isHave = (idx >= 0)
-
-      console.log('end:' + row.id)
-      console.log('end:' + idx)
 
       if (isHave) {
         /** 存在就替換 */
@@ -296,6 +242,8 @@ export default {
         })
       }
       window.localStorage.setItem('todo', JSON.stringify(this.listAll))
+
+      this.reload()
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -307,12 +255,8 @@ export default {
       })
     },
     handleDelete(row, index, id) {
-      console.log('del:' + id)
-
       this.listAll = JSON.parse(window.localStorage.getItem('todo'))
       const idx = this.listAll.findIndex(v => v.id === id)
-
-      console.log('idx:' + idx)
 
       this.$notify({
         title: 'Success',
@@ -323,6 +267,8 @@ export default {
       this.listAll.splice(idx, 1)
 
       window.localStorage.setItem('todo', JSON.stringify(this.listAll))
+
+      this.reload()
     },
     handleCreate() {
       this.resetTemp()
