@@ -106,6 +106,18 @@ export const constantRoutes = [
         meta: { title: '管理工作(cook)', icon: 'documentation', affix: true }
       }
     ]
+  },
+  {
+    path: '/store',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/tab/store'),
+        name: 'Store',
+        meta: { title: '管理Store', icon: 'documentation', affix: true }
+      }
+    ]
   }
   // {
   //   path: '/documentation',
