@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # 執行打包
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # 複製一份現在的 repo
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 建立 Node.js 執行環境
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 安裝 npm 相關的相依性
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
+
+      # 執行 Vite 的打包指令
+      - name: Build project
+        run: npm run build
+
+      # 上傳 dist 資料夾
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-files
+          path: ./dist
+  # 執行佈署
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      # 下載 dist 資料夾
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-files
+          path: ./dist
+      # 將 dist 資料夾佈署至 GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
